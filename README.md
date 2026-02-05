@@ -1,252 +1,135 @@
-# LLM4S - Large Language Models for Scala
-
-<h4 align="center">
-    <a href="https://github.com/llm4s/llm4s/blob/main/LICENSE">
-        <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt ="License">
-    </a>
-    <a href="https://discord.gg/4uvTPn6qww">
-        <img src="https://img.shields.io/static/v1?label=Chat%20on&message=Discord&color=blue&logo=Discord&style=flat-square" alt="Discord">
-    </a>
-    <a href="https://codecov.io/gh/llm4s/llm4s">
-        <img src="https://codecov.io/gh/llm4s/llm4s/branch/main/graph/badge.svg" alt="codecov">
-    </a>
-</h4>
-<h4 align="center">
-    <img src="docs/image_assets/llm4s_logo.png" width="100pt" alt="LLM4S Logo">
-</h4>
-
-## ⭐ Stars Over Time
-
-[![Star History Chart](https://api.star-history.com/svg?repos=llm4s/llm4s&type=Date)](https://star-history.com/#llm4s/llm4s&Date)
-
-
-
-## Project Momentum
-
-![GitHub Repo stars](https://img.shields.io/github/stars/llm4s/llm4s?style=for-the-badge&label=Stars&color=yellow)
-![GitHub forks](https://img.shields.io/github/forks/llm4s/llm4s?style=for-the-badge&label=Forks&color=green)
-![GitHub contributors](https://img.shields.io/github/contributors/llm4s/llm4s?style=for-the-badge&label=Contributors&color=blue)
-![GitHub issues](https://img.shields.io/github/issues/llm4s/llm4s?style=for-the-badge&label=Open%20Issues&color=purple)
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/llm4s/llm4s)
+# LLM4s
 
 ## Overview
 
-LLM4S provides a simple, robust, and scalable framework for building LLM applications in Scala. While most LLM work is done in Python, we believe that Scala offers a fundamentally better foundation for building reliable, maintainable AI-powered applications.
+**LLM4s** is an open-source initiative under the LLM4 organization focused on building, documenting, and sharing practical resources for working with **Large Language Models (LLMs)**. The project aims to make LLM concepts accessible to students, researchers, and developers through clean documentation, real-world examples, and beginner-to-advanced workflows.
 
-<p align="center">
-  <img src="docs/image_assets/llm4s-overview.jpeg" alt="LLM4S Overview" width="600"/>
-  <br>
-  <em></em>
-</p>
+Whether you are new to LLMs or exploring advanced topics like RAG and evaluation, LLM4s is designed to help you learn by doing.
 
-<br>
+---
 
-> **Note:** This is a work in progress project and is likely to change significantly over time.
+## Goals
 
-## Why Scala for LLMs?
+* Provide clear, beginner-friendly explanations of LLM concepts
+* Share practical examples for real-world LLM usage
+* Encourage open-source collaboration in the LLM ecosystem
+* Support students and contributors preparing for research programs and GSoC
 
-- **Type Safety**: Catch errors at compile time, not in production.
-- **Functional Programming**: Immutable data and pure functions for predictable, maintainable systems.
-- **JVM Ecosystem**: Access to mature, production-grade libraries and tooling.
-- **Concurrency**: Advanced models for safe, efficient parallelism.
-- **Performance**: JVM speed with functional elegance.
-- **Ecosystem Interoperability**: Seamless integration with enterprise JVM systems and cloud-native tooling.
+---
 
 ## Features
 
-- **Multi-Provider Support**: Connect seamlessly to multiple LLM providers (OpenAI, Anthropic, Google Gemini, Azure, Ollama).
-- **Execution Environments**: Run LLM-driven operations in secure, containerized or non-containerized setups.
-- **Error Handling**: Robust mechanisms to catch, log, and recover from failures gracefully.
-- **MCP Support**: Integration with Model Context Protocol for richer context management.
-- **Agent Framework**: Build single or multi-agent workflows with standardized interfaces.
-- **Multimodal Generation**: Support for text, image, voice, and other LLM modalities.
-- **RAG (Retrieval-Augmented Generation)**: Built-in tools for search, embedding, retrieval workflows, and RAGAS evaluation with benchmarking harness.
-- **Observability**: Detailed trace logging, monitoring, and analytics for debugging and performance insights.
+* 📘 LLM fundamentals and prompt engineering guides
+* 🧪 Evaluation techniques for LLM outputs
+* 🧠 Examples using OpenAI-compatible APIs
+* 📂 Modular structure for easy contributions
+* 🌱 Beginner-friendly issues and documentation
 
-## Architecture
-
-```text
-        ┌───────────────────────────┐
-        │    LLM4S API Layer        │
-        └──────────┬────────────────┘
-                   │
-          Multi-Provider Connector
-       (OpenAI | Anthropic | Future...)
-                   │
-         ┌─────────┴─────────┐
-         │ Execution Manager │
-         └─────────┬─────────┘
-                   │
-        ┌──────────┴──────────┐
-        │   Agent Framework   │
-        └──────────┬──────────┘
-                   │
-      ┌────────────┴────────────┐
-      │  RAG Engine + Tooling   │
-      └────────────┬────────────┘
-                   │
-     ┌─────────────┴─────────────┐
-     │   Observability Layer     │
-     └───────────────────────────┘
-
-```
+---
 
 ## Project Structure
 
-- **modules/core**: Core LLM4S framework
-- **modules/workspace**: Workspace runner/client/shared
-- **modules/crossTest**: Cross-version tests
-- **modules/samples**: Usage examples
-- **docs**: Documentation site and references
-- **hooks**: Pre-commit hook installer
+```
+LLM4s/
+│
+├── docs/                 # Conceptual documentation
+│   ├── prompt_engineering.md
+│   ├── llm_evaluation.md
+│
+├── examples/             # Practical examples
+│   ├── simple_llm_demo.py
+│
+├── README.md
+└── CONTRIBUTING.md
+```
+
+---
 
 ## Getting Started
 
-To get started with the LLM4S project, check out this teaser talk presented by **Kannupriya Kalra** at the Bay Area Scala Conference. This recording is essential for understanding where we’re headed:
-
-🎥 **Teaser Talk:** https://www.youtube.com/watch?v=SXybj2P3_DE&ab_channel=SalarRahmanian
-
-<br>
-
-<p align="center">
-  <img src="docs/image_assets/talks/BayAreaScalaConference_tubiOffice.jpeg" alt="Bay Area Scala Conference at Tubi Office" width="400" style="margin-right: 10px;"/>
-  <img src="docs/image_assets/talks/BayAreaScalaConference_GenAiSlide.jpeg" alt="Bay Area Scala Conference Generative AI Slide" width="400"/>
-  <br>
-  <em>LLM4S was officially introduced at the Bay Area Scala Conference in San Francisco on February 25, 2025.</em>
-</p>
-
-<br>
-
-### Setting Up Pre-commit Hooks
-
-To ensure code quality, we use a Git pre-commit hook that automatically checks code formatting and runs tests before allowing commits:
-
-```bash
-# Install the pre-commit hook
-./hooks/install.sh
-
-# The hook will automatically:
-# - Check code formatting with scalafmt
-# - Compile code for both Scala 2.13 and 3
-# - Run tests for both Scala versions
-
-# To skip the hook temporarily (not recommended):
-# git commit --no-verify
-```
-
 ### Prerequisites
 
-- JDK 21+
-- SBT
-- Docker (for containerized workspace)
+* Python 3.8+
+* Basic knowledge of Python and Git
 
-### Building the Project
-
-```bash
-sbt compile
-
-# For all supported Scala versions (2.13 and 3)
-sbt +compile
-
-# Build and test all versions
-sbt buildAll
-```
-
-### Setup your LLM Environment
-
-You will need an API key for either OpenAI (https://platform.openai.com/) or Anthropic (https://console.anthropic.com/)
-other LLMS may be supported in the future (see the backlog).
-
-Set the environment variables:
-
-```
-LLM_MODEL=openai/gpt-4o
-OPENAI_API_KEY=<your_openai_api_key>
-```
-
-or Anthropic:
-
-```
-LLM_MODEL=anthropic/claude-sonnet-4-5-latest
-ANTHROPIC_API_KEY=<your_anthropic_api_key>
-```
-
-or OpenRouter:
-
-```
-LLM_MODEL=openai/gpt-4o
-OPENAI_API_KEY=<your_openai_api_key>
-OPENAI_BASE_URL=https://openrouter.ai/api/v1
-```
-
-or Z.ai:
-
-```
-LLM_MODEL=zai/GLM-4.7
-ZAI_API_KEY=<your_zai_api_key>
-ZAI_BASE_URL=https://api.z.ai/api/paas/v4
-```
-
-This will allow you to run the non-containerized examples.
-
-### Running the Examples
+### Installation
 
 ```bash
-# Using Scala 3
-sbt "samples/runMain org.llm4s.samples.basic.BasicLLMCallingExample"
+git clone https://github.com/LLM4/LLM4s.git
+cd LLM4s
+pip install -r requirements.txt
 ```
 
-### Run containerized demo
+---
 
-```bash
-sbt docker:publishLocal
-sbt "workspaceSamples/runMain org.llm4s.samples.workspace.ContainerisedWorkspaceDemo"
+## Example Usage
 
-# Using Scala 2.13
-sbt ++2.13.16 "samples/runMain org.llm4s.samples.basic.BasicLLMCallingExample"
+```python
+from openai import OpenAI
+
+client = OpenAI()
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[{"role": "user", "content": "Explain LLMs simply."}]
+)
+
+print(response.choices[0].message.content)
 ```
 
-### Cross Compilation
+---
 
-LLM4S supports Scala 2.13 and Scala 3.7.1. The build supports version-specific code through source directories when needed:
+## How to Contribute
 
-- `src/main/scala` - Common code for all versions
-- `src/main/scala-2.13` - Scala 2.13 specific code (add when needed)
-- `src/main/scala-3` - Scala 3 specific code (add when needed)
+We welcome contributions of all sizes! 🚀
 
-When you need to use version-specific features, place the code in the appropriate directory.
+1. Fork the repository
+2. Create a new branch (`issue-<number>-feature-name`)
+3. Make your changes
+4. Commit with a clear message
+5. Open a Pull Request linked to an issue
 
-We've added convenient aliases for cross-compilation:
+Check out `CONTRIBUTING.md` for detailed guidelines.
 
-```bash
-# Compile for all Scala versions
-sbt compileAll
+---
 
-# Test all Scala versions
-sbt testAll
+## Good First Issues
 
-# Both compile and test
-sbt buildAll
+Look for issues labeled:
 
-# Publish for all versions
-sbt publishAll
-```
+* `good first issue`
+* `documentation`
+* `LLM`
 
-### Cross-Compilation Testing
+These are perfect for new contributors.
 
-We use specialized test projects to verify cross-version compatibility against the published artifacts. These tests ensure that the library works correctly across different Scala versions by testing against actual published JARs rather than local target directories.
-
-```bash
-# Run tests for both Scala 2 and 3 against published JARs
-sbt testCross
-
-# Full clean, publish, and test verification
-sbt fullCrossTest
-```
-
-> **Note:** For detailed information about our cross-testing strategy and setup, see [modules/crossTest/README.md](modules/crossTest/README.md)
+---
 
 ## Roadmap
+
+* [ ] Add Retrieval-Augmented Generation (RAG) examples
+* [ ] Add LLM evaluation benchmarks
+* [ ] Add fine-tuning walkthroughs
+* [ ] Add agent-based LLM examples
+
+---
+
+## Community & Support
+
+* Open an issue for bugs or feature requests
+* Be respectful and collaborative
+* Follow open-source best practices
+
+---
+
+## License
+
+This project is licensed under the **MIT License**.
+
+---
+
+## Acknowledgements
+
+Thanks to the open-source community and contributors who make LLM learning accessible for everyone ❤️
 
 Our goal is to implement Scala equivalents of popular Python LLM frameworks, with **multi-provider, multimodal, and observability-first design** as core principles.
 

@@ -1,24 +1,135 @@
-# LLM4S - Large Language Models for Scala
+# LLM4s
 
-<h4 align="center">
-    <a href="https://github.com/llm4s/llm4s/blob/main/LICENSE">
-        <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt ="License">
-    </a>
-    <a href="https://discord.gg/4uvTPn6qww">
-        <img src="https://img.shields.io/static/v1?label=Chat%20on&message=Discord&color=blue&logo=Discord&style=flat-square" alt="Discord">
-    </a>
-    <a href="https://codecov.io/gh/llm4s/llm4s">
-        <img src="https://codecov.io/gh/llm4s/llm4s/branch/main/graph/badge.svg" alt="codecov">
-    </a>
-</h4>
-<h4 align="center">
-    <img src="docs/image_assets/llm4s_logo.png" width="100pt" alt="LLM4S Logo">
-</h4>
+## Overview
 
-## ⭐ Stars Over Time
+**LLM4s** is an open-source initiative under the LLM4 organization focused on building, documenting, and sharing practical resources for working with **Large Language Models (LLMs)**. The project aims to make LLM concepts accessible to students, researchers, and developers through clean documentation, real-world examples, and beginner-to-advanced workflows.
 
-[![Star History Chart](https://api.star-history.com/svg?repos=llm4s/llm4s&type=Date)](https://star-history.com/#llm4s/llm4s&Date)
+Whether you are new to LLMs or exploring advanced topics like RAG and evaluation, LLM4s is designed to help you learn by doing.
 
+---
+
+## Goals
+
+* Provide clear, beginner-friendly explanations of LLM concepts
+* Share practical examples for real-world LLM usage
+* Encourage open-source collaboration in the LLM ecosystem
+* Support students and contributors preparing for research programs and GSoC
+
+---
+
+## Features
+
+* 📘 LLM fundamentals and prompt engineering guides
+* 🧪 Evaluation techniques for LLM outputs
+* 🧠 Examples using OpenAI-compatible APIs
+* 📂 Modular structure for easy contributions
+* 🌱 Beginner-friendly issues and documentation
+
+---
+
+## Project Structure
+
+```
+LLM4s/
+│
+├── docs/                 # Conceptual documentation
+│   ├── prompt_engineering.md
+│   ├── llm_evaluation.md
+│
+├── examples/             # Practical examples
+│   ├── simple_llm_demo.py
+│
+├── README.md
+└── CONTRIBUTING.md
+```
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+* Python 3.8+
+* Basic knowledge of Python and Git
+
+### Installation
+
+```bash
+git clone https://github.com/LLM4/LLM4s.git
+cd LLM4s
+pip install -r requirements.txt
+```
+
+---
+
+## Example Usage
+
+```python
+from openai import OpenAI
+
+client = OpenAI()
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[{"role": "user", "content": "Explain LLMs simply."}]
+)
+
+print(response.choices[0].message.content)
+```
+
+---
+
+## How to Contribute
+
+We welcome contributions of all sizes! 🚀
+
+1. Fork the repository
+2. Create a new branch (`issue-<number>-feature-name`)
+3. Make your changes
+4. Commit with a clear message
+5. Open a Pull Request linked to an issue
+
+Check out `CONTRIBUTING.md` for detailed guidelines.
+
+---
+
+## Good First Issues
+
+Look for issues labeled:
+
+* `good first issue`
+* `documentation`
+* `LLM`
+
+These are perfect for new contributors.
+
+---
+
+## Roadmap
+
+* [ ] Add Retrieval-Augmented Generation (RAG) examples
+* [ ] Add LLM evaluation benchmarks
+* [ ] Add fine-tuning walkthroughs
+* [ ] Add agent-based LLM examples
+
+---
+
+## Community & Support
+
+* Open an issue for bugs or feature requests
+* Be respectful and collaborative
+* Follow open-source best practices
+
+---
+
+## License
+
+This project is licensed under the **MIT License**.
+
+---
+
+## Acknowledgements
+
+Thanks to the open-source community and contributors who make LLM learning accessible for everyone ❤️
 
 
 ## Project Momentum

@@ -1,0 +1,86 @@
+Summary
+
+This PR implements the search() method in PostgresMemoryStore using EmbeddingService to enable semantic similarity search over stored memory embeddings.
+
+Closes #526
+What This PR Does
+
+Integrates EmbeddingService to generate query embeddings
+
+Uses cosine similarity for vector search
+
+Performs similarity search directly in PostgreSQL
+
+Returns top-k most relevant memory entries
+
+Handles empty query & edge cases
+
+Adds basic validation and error handling
+Design Approach
+
+Generate embedding for the search query.
+
+Use PostgreSQL vector similarity (<=> operator for cosine distance, assuming pgvector).
+
+Order results by similarity.
+
+Return top k matches.
+Assumptions
+
+PostgreSQL with pgvector extension enabled
+
+Table schema:
+CREATE TABLE memories (
+    id UUID PRIMARY KEY,
+    content TEXT NOT NULL,
+    embedding VECTOR(1536),
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+IMPLEMENTATION
+Example TypeScript Implementation
+import { Pool } from "pg";
+import { EmbeddingService } from "../services/EmbeddingService";
+
+export class PostgresMemoryStore {
+  private pool: Pool;
+  private embeddingService: EmbeddingService;
+
+  constructor(pool: Pool, embeddingService: EmbeddingService) {
+    this.pool = pool;
+    this.embeddingService = embeddingService;
+  }
+
+  /**
+   * Perform semantic search on stored memories.
+   * @param query - User search query
+   * @param limit - Number of results to return
+   */
+  async search(query: string, limit: number = 5) {
+    if (!query || query.trim().length === 0) {
+      throw new Error("Search query cannot be empty.");
+    }
+
+    try {
+      // Step 1: Generate embedding
+      const queryEmbedding = await this.embeddingService.embed(query);
+
+      // Step 2: Perform similarity search
+      const result = await this.pool.query(
+        `
+        SELECT id, content,
+               1 - (embedding <=> $1) AS similarity
+        FROM memories
+        ORDER BY embedding <=> $1
+        LIMIT $2;
+        `,
+        [queryEmbedding, limit]
+      );
+
+      return result.rows;
+    } catch (error) {
+      console.error("Error during semantic search:", error);
+      throw error;
+    }
+  }
+}

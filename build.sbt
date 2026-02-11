@@ -285,7 +285,3 @@ lazy val crossTestScala3 = (project in file("modules/crossTest/scala3"))
       Deps.scalatest % Test
     )
   )
-
-mimaPreviousArtifacts := Set(
-  organization.value %% "llm4s" % "0.1.4"
-)

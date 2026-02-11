@@ -18,12 +18,47 @@ Whether you are new to LLMs or exploring advanced topics like RAG and evaluation
 ---
 
 ## Features
-
 * 📘 LLM fundamentals and prompt engineering guides
 * 🧪 Evaluation techniques for LLM outputs
 * 🧠 Examples using OpenAI-compatible APIs
 * 📂 Modular structure for easy contributions
 * 🌱 Beginner-friendly issues and documentation
+
+- **Multi-Provider Support**: Connect seamlessly to multiple LLM providers (OpenAI, Anthropic, Google Gemini, Azure, Ollama, DeepSeek).
+- **Execution Environments**: Run LLM-driven operations in secure, containerized or non-containerized setups.
+- **Error Handling**: Robust mechanisms to catch, log, and recover from failures gracefully.
+- **MCP Support**: Integration with Model Context Protocol for richer context management.
+- **Agent Framework**: Build single or multi-agent workflows with standardized interfaces.
+- **Multimodal Generation**: Support for text, image, voice, and other LLM modalities.
+- **RAG (Retrieval-Augmented Generation)**: Built-in tools for search, embedding, retrieval workflows, and RAGAS evaluation with benchmarking harness.
+- **Observability**: Detailed trace logging, monitoring, and analytics for debugging and performance insights.
+
+## Architecture
+
+```text
+        ┌───────────────────────────┐
+        │    LLM4S API Layer        │
+        └──────────┬────────────────┘
+                   │
+          Multi-Provider Connector
+        (OpenAI | Anthropic | DeepSeek | ...)
+                   │
+         ┌─────────┴─────────┐
+         │ Execution Manager │
+         └─────────┬─────────┘
+                   │
+        ┌──────────┴──────────┐
+        │   Agent Framework   │
+        └──────────┬──────────┘
+                   │
+      ┌────────────┴────────────┐
+      │  RAG Engine + Tooling   │
+      └────────────┬────────────┘
+                   │
+     ┌─────────────┴─────────────┐
+     │   Observability Layer     │
+     └───────────────────────────┘
+
 
 ---
 
@@ -91,6 +126,14 @@ We welcome contributions of all sizes! 🚀
 Check out `CONTRIBUTING.md` for detailed guidelines.
 
 ---
+
+### Using DeepSeek
+
+```bash
+LLM_MODEL=deepseek/deepseek-chat
+DEEPSEEK_API_KEY=<your_deepseek_api_key>
+# Optional: DEEPSEEK_BASE_URL defaults to https://api.deepseek.com
+
 
 ## Good First Issues
 
@@ -343,8 +386,8 @@ Use these loaders to convert flat keys and HOCON paths into typed, validated set
     - **Ollama** (local): `OLLAMA_EMBEDDING_BASE_URL` (default: `http://localhost:11434`), `OLLAMA_EMBEDDING_MODEL`
 
 - Provider API keys and endpoints
-  - Keys: `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `ANTHROPIC_API_KEY`, `ANTHROPIC_BASE_URL`, `AZURE_API_BASE`, `AZURE_API_KEY`, `AZURE_API_VERSION`, `OLLAMA_BASE_URL`
-  - Type: concrete `ProviderConfig` (e.g., `OpenAIConfig`, `AnthropicConfig`, `AzureConfig`, `OllamaConfig`)
+  - Keys: `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `ANTHROPIC_API_KEY`, `ANTHROPIC_BASE_URL`, `AZURE_API_BASE`, `AZURE_API_KEY`, `AZURE_API_VERSION`, `OLLAMA_BASE_URL`, `DEEPSEEK_API_KEY`, `DEEPSEEK_BASE_URL`
+  - Type: concrete `ProviderConfig` (e.g., `OpenAIConfig`, `AnthropicConfig`, `AzureConfig`, `OllamaConfig`, `DeepSeekConfig`)
   - Loader: `Llm4sConfig.provider()` → then provider-specific config constructors
 
 Tracing

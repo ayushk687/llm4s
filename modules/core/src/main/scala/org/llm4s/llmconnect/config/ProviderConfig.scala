@@ -370,3 +370,79 @@ object GeminiConfig {
     )
   }
 }
+
+case class DeepSeekConfig(
+  apiKey: String,
+  model: String,
+  baseUrl: String,
+  contextWindow: Int,
+  reserveCompletion: Int
+) extends ProviderConfig {
+  override def toString: String =
+    s"DeepSeekConfig(apiKey=${Redaction.secret(apiKey)}, model=$model, baseUrl=$baseUrl, contextWindow=$contextWindow, " +
+      s"reserveCompletion=$reserveCompletion)"
+}
+
+object DeepSeekConfig {
+  private val logger = LoggerFactory.getLogger(getClass)
+
+  val DEFAULT_BASE_URL: String = "https://api.deepseek.com"
+
+  private def getContextWindowForModel(modelName: String): (Int, Int) = {
+    val standardReserve = 8192 // 8K tokens reserved for completion (DeepSeek supports large outputs)
+
+    val registryResult =
+      ModelRegistry
+        .lookup("deepseek", modelName)
+        .toOption
+        .orElse(ModelRegistry.lookup(modelName).toOption)
+
+    registryResult match {
+      case Some(metadata) =>
+        val contextWindow = metadata.maxInputTokens.getOrElse(64000)
+        val reserve       = metadata.maxOutputTokens.getOrElse(standardReserve)
+        logger.debug(s"Using ModelRegistry metadata for $modelName: context=$contextWindow, reserve=$reserve")
+        (contextWindow, reserve)
+      case None =>
+        logger.debug(s"Model $modelName not found in registry, using fallback values")
+
+        // Explicit allowlist based on official DeepSeek API (as of Feb 2026)
+        // Source: https://api-docs.deepseek.com/quick_start/pricing
+        // Only two official API models: deepseek-chat and deepseek-reasoner
+        modelName.toLowerCase match {
+          // Official DeepSeek-V3.2 API models (both have 128K context)
+          case "deepseek-chat" | "deepseek/deepseek-chat" | "deepseek-reasoner" | "deepseek/deepseek-reasoner" =>
+            (128000, standardReserve)
+
+          // Legacy/variant model names (for backward compatibility)
+          case "deepseek-chat-r1" | "deepseek/deepseek-chat-r1" | "deepseek-r1-distill" |
+              "deepseek/deepseek-r1-distill" | "deepseek-coder" | "deepseek/deepseek-coder" | "deepseek-v3" |
+              "deepseek/deepseek-v3" =>
+            logger.warn(s"Legacy/variant model $modelName - may not be available via official API")
+            (128000, standardReserve) // Conservative: assume 128K for all DeepSeek models
+
+          // Unknown model - conservative fallback
+          case _ =>
+            logger.warn(s"Unknown DeepSeek model: $modelName, using conservative 128K fallback")
+            (128000, standardReserve)
+        }
+    }
+  }
+
+  def fromValues(
+    modelName: String,
+    apiKey: String,
+    baseUrl: String
+  ): DeepSeekConfig = {
+    require(apiKey.trim.nonEmpty, "DeepSeek apiKey must be non-empty")
+    require(baseUrl.trim.nonEmpty, "DeepSeek baseUrl must be non-empty")
+    val (cw, rc) = getContextWindowForModel(modelName)
+    DeepSeekConfig(
+      apiKey = apiKey,
+      model = modelName,
+      baseUrl = baseUrl,
+      contextWindow = cw,
+      reserveCompletion = rc
+    )
+  }
+}

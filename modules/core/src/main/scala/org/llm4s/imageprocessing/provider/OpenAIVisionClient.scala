@@ -17,6 +17,8 @@ class OpenAIVisionClient(config: OpenAIVisionConfig) extends org.llm4s.imageproc
 
   private val localProcessor = new LocalImageProcessor()
 
+  private val logger = org.slf4j.LoggerFactory.getLogger(getClass)
+
   /**
    * Analyzes an image using OpenAI's GPT-4 Vision API.
    *
@@ -203,13 +205,20 @@ class OpenAIVisionClient(config: OpenAIVisionConfig) extends org.llm4s.imageproc
                     case (Some(msg), _, Some(code)) => s"$code: $msg"
                     case (Some(msg), Some(typ), _)  => s"$typ: $msg"
                     case (Some(msg), _, _)          => msg
-                    case _                          => errorBody
+                    case _                          => org.llm4s.util.Redaction.truncateForLog(errorBody)
                   }
                 }
                 .map(d => s"Status $statusCode: $d")
-                .getOrElse(s"Status $statusCode: $errorBody")
-            case Right(body) => s"Status $statusCode: $body"
+                .getOrElse(s"Status $statusCode: ${org.llm4s.util.Redaction.truncateForLog(errorBody)}")
+            case Right(body) => s"Status $statusCode: ${org.llm4s.util.Redaction.truncateForLog(body)}"
           }
+
+          // Log a truncated version to avoid leaking very large or sensitive payloads
+          logger.error(
+            "[OpenAIVisionClient] HTTP error {}: {}",
+            statusCode.asInstanceOf[AnyRef],
+            org.llm4s.util.Redaction.truncateForLog(response.body.fold(identity, identity))
+          )
           throw new RuntimeException(s"OpenAI API call failed - $errorMessage")
       }
     }

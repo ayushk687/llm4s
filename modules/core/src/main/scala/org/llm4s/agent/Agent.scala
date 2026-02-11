@@ -40,6 +40,10 @@ private[agent] object HandoffResult {
  *  - '''Guardrails''': Input/output validation with composable guardrail chains
  *  - '''Streaming Events''': Real-time event callbacks during execution
  *
+ * == Security ==
+ * By default, agents have a maximum step limit of 50 to prevent infinite loops.
+ * This can be overridden by setting `maxSteps` explicitly.
+ *
  * == Basic Usage ==
  * {{{
  * for {
@@ -80,6 +84,7 @@ private[agent] object HandoffResult {
  * @see [[org.llm4s.agent.guardrails.OutputGuardrail]] for output validation
  */
 class Agent(client: LLMClient) {
+
   private val logger = LoggerFactory.getLogger(getClass)
 
   /**
@@ -339,14 +344,8 @@ class Agent(client: LLMClient) {
               logger.error("[DEBUG]   Error type: {}", error.getClass.getSimpleName)
               logger.error("[DEBUG]   Error message: {}", errorMessage)
             }
-            // Escape the error message for JSON
-            val escapedMessage = errorMessage
-              .replace("\\", "\\\\")
-              .replace("\"", "\\\"")
-              .replace("\n", "\\n")
-              .replace("\r", "\\r")
-              .replace("\t", "\\t")
-            val errorJson = s"""{ "isError": true, "error": "$escapedMessage" }"""
+            // Build structured JSON error using ujson (no manual escaping needed)
+            val errorJson = ToolCallErrorJson.toJson(error).render()
             if (!debug) {
               logger.warn("Tool {} failed in {}ms with error: {}", toolCall.name, duration, errorMessage)
             }
@@ -423,13 +422,8 @@ class Agent(client: LLMClient) {
           if (debug) {
             logger.error("[DEBUG] Tool {} FAILED in {}ms: {}", toolCall.name, duration, errorMessage)
           }
-          val escapedMessage = errorMessage
-            .replace("\\", "\\\\")
-            .replace("\"", "\\\"")
-            .replace("\n", "\\n")
-            .replace("\r", "\\r")
-            .replace("\t", "\\t")
-          s"""{ "isError": true, "error": "$escapedMessage" }"""
+          // Build structured JSON error using ujson (no manual escaping needed)
+          ToolCallErrorJson.toJson(error).render()
       }
 
       ToolMessage(resultContent, toolCall.id)
@@ -907,7 +901,8 @@ class Agent(client: LLMClient) {
    * @param inputGuardrails Validate query before processing (default: none)
    * @param outputGuardrails Validate response before returning (default: none)
    * @param handoffs Available handoffs (default: none)
-   * @param maxSteps Optional limit on the number of steps to execute
+   * @param maxSteps Limit on the number of steps to execute (default: Agent.DefaultMaxSteps for safety).
+   *                 Set to None for unlimited steps (use with caution).
    * @param traceLogPath Optional path to write a markdown trace file
    * @param systemPromptAddition Optional additional text to append to the default system prompt
    * @param completionOptions Optional completion options for LLM calls (temperature, maxTokens, etc.)
@@ -920,7 +915,7 @@ class Agent(client: LLMClient) {
     inputGuardrails: Seq[InputGuardrail] = Seq.empty,
     outputGuardrails: Seq[OutputGuardrail] = Seq.empty,
     handoffs: Seq[Handoff] = Seq.empty,
-    maxSteps: Option[Int] = None,
+    maxSteps: Option[Int] = Some(Agent.DefaultMaxSteps),
     traceLogPath: Option[String] = None,
     systemPromptAddition: Option[String] = None,
     completionOptions: CompletionOptions = CompletionOptions(),
@@ -1039,7 +1034,8 @@ class Agent(client: LLMClient) {
    * @param initialQuery The first user message
    * @param followUpQueries Additional user messages to process in sequence
    * @param tools Tool registry for the conversation
-   * @param maxStepsPerTurn Optional step limit per turn
+   * @param maxStepsPerTurn Step limit per turn (default: Agent.DefaultMaxSteps for safety).
+   *                        Set to None for unlimited steps (use with caution).
    * @param systemPromptAddition Optional system prompt addition
    * @param completionOptions Completion options
    * @param contextWindowConfig Optional configuration for automatic context pruning
@@ -1062,7 +1058,7 @@ class Agent(client: LLMClient) {
     initialQuery: String,
     followUpQueries: Seq[String],
     tools: ToolRegistry,
-    maxStepsPerTurn: Option[Int] = None,
+    maxStepsPerTurn: Option[Int] = Some(Agent.DefaultMaxSteps),
     systemPromptAddition: Option[String] = None,
     completionOptions: CompletionOptions = CompletionOptions(),
     contextWindowConfig: Option[ContextWindowConfig] = None,
@@ -1118,7 +1114,8 @@ class Agent(client: LLMClient) {
    * @param inputGuardrails Validate query before processing (default: none)
    * @param outputGuardrails Validate response before returning (default: none)
    * @param handoffs Available handoffs (default: none)
-   * @param maxSteps Optional limit on the number of steps to execute
+   * @param maxSteps Limit on the number of steps to execute (default: Agent.DefaultMaxSteps for safety).
+   *                 Set to None for unlimited steps (use with caution).
    * @param traceLogPath Optional path to write a markdown trace file
    * @param systemPromptAddition Optional additional text to append to the default system prompt
    * @param completionOptions Optional completion options for LLM calls
@@ -1148,7 +1145,7 @@ class Agent(client: LLMClient) {
     inputGuardrails: Seq[InputGuardrail] = Seq.empty,
     outputGuardrails: Seq[OutputGuardrail] = Seq.empty,
     handoffs: Seq[Handoff] = Seq.empty,
-    maxSteps: Option[Int] = None,
+    maxSteps: Option[Int] = Some(Agent.DefaultMaxSteps),
     traceLogPath: Option[String] = None,
     systemPromptAddition: Option[String] = None,
     completionOptions: CompletionOptions = CompletionOptions(),
@@ -1381,9 +1378,9 @@ class Agent(client: LLMClient) {
           (jsonStr, true)
 
         case Left(error) =>
-          val errorMessage   = error.getFormattedMessage
-          val escapedMessage = errorMessage.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n")
-          val errorJson      = s"""{ "isError": true, "error": "$escapedMessage" }"""
+          val errorMessage = error.getFormattedMessage
+          // Build structured JSON error using ujson (no manual escaping needed)
+          val errorJson = ToolCallErrorJson.toJson(error).render()
           if (debug) {
             logger.error("[DEBUG] Tool {} FAILED in {}ms: {}", toolCall.name, duration, errorMessage)
           }
@@ -1513,7 +1510,8 @@ class Agent(client: LLMClient) {
    *
    * @param query The user query to process
    * @param tools The registry of available tools
-   * @param maxSteps Optional limit on the number of steps
+   * @param maxSteps Limit on the number of steps (default: 50 for safety).
+   *                 Set to None for unlimited steps (use with caution).
    * @param systemPromptAddition Optional system prompt addition
    * @param completionOptions Completion options
    * @param debug Enable debug logging
@@ -1522,7 +1520,7 @@ class Agent(client: LLMClient) {
   def runCollectingEvents(
     query: String,
     tools: ToolRegistry,
-    maxSteps: Option[Int] = None,
+    maxSteps: Option[Int] = Some(Agent.DefaultMaxSteps),
     systemPromptAddition: Option[String] = None,
     completionOptions: CompletionOptions = CompletionOptions(),
     debug: Boolean = false
@@ -1560,7 +1558,8 @@ class Agent(client: LLMClient) {
    * @param inputGuardrails Validate query before processing (default: none)
    * @param outputGuardrails Validate response before returning (default: none)
    * @param handoffs Available handoffs (default: none)
-   * @param maxSteps Optional limit on the number of steps to execute
+   * @param maxSteps Limit on the number of steps to execute (default: Agent.DefaultMaxSteps for safety).
+   *                 Set to None for unlimited steps (use with caution).
    * @param traceLogPath Optional path to write a markdown trace file
    * @param systemPromptAddition Optional additional text to append to the default system prompt
    * @param completionOptions Optional completion options for LLM calls
@@ -1594,7 +1593,7 @@ class Agent(client: LLMClient) {
     inputGuardrails: Seq[InputGuardrail] = Seq.empty,
     outputGuardrails: Seq[OutputGuardrail] = Seq.empty,
     handoffs: Seq[Handoff] = Seq.empty,
-    maxSteps: Option[Int] = None,
+    maxSteps: Option[Int] = Some(Agent.DefaultMaxSteps),
     traceLogPath: Option[String] = None,
     systemPromptAddition: Option[String] = None,
     completionOptions: CompletionOptions = CompletionOptions(),
@@ -1809,4 +1808,13 @@ class Agent(client: LLMClient) {
       validatedState <- validateOutput(finalState, outputGuardrails)
     } yield validatedState
   }
+}
+
+object Agent {
+
+  /**
+   * Default maximum number of steps for agent execution.
+   * This prevents infinite loops when the LLM repeatedly requests tool calls.
+   */
+  val DefaultMaxSteps: Int = 50
 }

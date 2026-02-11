@@ -78,11 +78,13 @@ class DefaultLangfuseBatchSender extends LangfuseBatchSender {
       if (response.statusCode == 207 || (response.statusCode >= 200 && response.statusCode < 300)) {
         logger.info(s"[Langfuse] Batch export successful: ${response.statusCode}")
         if (response.statusCode == 207) {
-          logger.info(s"[Langfuse] Partial success response: ${response.text()}")
+          logger.info(
+            s"[Langfuse] Partial success response: ${org.llm4s.util.Redaction.truncateForLog(response.text())}"
+          )
         }
       } else {
         logger.error(s"[Langfuse] Batch export failed: ${response.statusCode}")
-        logger.error(s"[Langfuse] Response body: ${response.text()}")
+        logger.error(s"[Langfuse] Response body: ${org.llm4s.util.Redaction.truncateForLog(response.text())}")
         logger.error(s"[Langfuse] Request URL: ${config.langfuseUrl}")
         logger.error(s"[Langfuse] Request payload size: ${batchPayload.render().length} bytes")
       }

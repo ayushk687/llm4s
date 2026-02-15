@@ -1,0 +1,25 @@
+## Overview
+
+This PR introduces a modular Retrieval-Augmented Generation (RAG) example to demonstrate how to ground Large Language Model (LLM) responses using external knowledge sources.
+
+The goal of this enhancement is to provide a practical, production-aligned architecture that helps reduce hallucinations and improves response reliability.
+
+---
+
+## Motivation
+
+While the repository currently provides foundational LLM usage examples, it does not include a real-world architecture demonstrating:
+
+- Context grounding
+- Hallucination mitigation
+- Vector similarity search
+- Modular LLM pipeline design
+
+RAG is widely adopted in modern LLM applications, and including a structured example significantly improves the repository’s educational and practical value.
+
+---
+
+## What This PR Adds
+
+### New Module: `rag-module/`
+

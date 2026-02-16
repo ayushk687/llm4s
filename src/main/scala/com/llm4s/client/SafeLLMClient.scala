@@ -82,6 +82,29 @@ object SafeLLMClient {
     reader.close()
     response
   }
+
+  fix(scala): handle unhandled Future failures in async LLM client
+
+Previously, LLM API calls wrapped in Scala Futures did not implement
+proper failure recovery. When API requests failed due to network
+errors, invalid API keys, or timeouts, exceptions propagated and
+caused application crashes.
+
+This commit introduces a SafeLLMClient with structured error handling
+using `.recover` to gracefully handle asynchronous failures.
+Fallback responses are returned and errors are logged to prevent
+unexpected termination.
+
+Changes:
+- Added SafeLLMClient.scala
+- Wrapped LLM API calls with Future recovery
+- Improved runtime stability
+- Maintained backward compatibility
+
+Impact:
+Prevents async crashes and improves production reliability
+for Scala-based LLM integrations.
+
 }
 git add src/main/scala/com/llm4s/client/SafeLLMClient.scala
 git commit -m "Fix: Add SafeLLMClient with proper Future error handling"
